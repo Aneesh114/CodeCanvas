@@ -10,11 +10,13 @@ import {
     TypeIcon,
     Undo2,
     Grid,
-    Grip, // Import a grid icon
-} from "lucide-react"; // Make sure to import a grid icon or any other icon you want to use
+    Grip,
+    FileText,
+} from "lucide-react";
 import { CanvasMode, CanvasState, LayerType } from "@/types/canvas";
 import { useEffect } from "react";
 import { useSelf } from "@liveblocks/react/suspense";
+import { Button } from "@/components/ui/button";
 
 interface ToolbarProps {
     canvasState: CanvasState;
@@ -23,8 +25,9 @@ interface ToolbarProps {
     redo: () => void;
     canUndo: boolean;
     canRedo: boolean;
-    toggleGrid: () => void; // Add toggleGrid prop
+    toggleGrid: () => void;
     toggleDots: () => void;
+    setIsTextEditorOpen: (isOpen: boolean) => void; // Add this prop
 }
 
 const Toolbar = ({
@@ -35,7 +38,8 @@ const Toolbar = ({
     canUndo,
     canRedo,
     toggleGrid,
-    toggleDots, // Add toggleGrid to props
+    toggleDots,
+    setIsTextEditorOpen, // Add this to props
 }: ToolbarProps) => {
     const selection = useSelf((me) => me.presence.selection);
 
@@ -188,16 +192,20 @@ const Toolbar = ({
                 />
                 <ToolButton
                     label="Toggle Grid"
-                    icon={Grid} // Use your grid icon here
-                    onClick={toggleGrid} // Call the toggleGrid function on click
+                    icon={Grid}
+                    onClick={toggleGrid}
                 />
                 <ToolButton
-                    label="Toggle dots"
-                    icon={Grip} // Use your grid icon here
-                    onClick={toggleDots} // Call the toggleGrid function on click
+                    label="Toggle Dots"
+                    icon={Grip}
+                    onClick={toggleDots}
+                />
+                <ToolButton
+                    label="Text Editor"
+                    icon={FileText}
+                    onClick={() => setIsTextEditorOpen(true)}
                 />
             </div>
-            
         </div>
     );
 };

@@ -15,6 +15,7 @@ export type Color = {
     Path,
     Text,
     Note,
+    TextAttachment = "text-attachment"
   }
   
   export type RectangleLayer = {
@@ -36,7 +37,15 @@ export type Color = {
     fill: Color;
     value?: string;
   };
-  
+  export type TextAttachmentLayer = {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    fill: Color;
+    type: LayerType.TextAttachment;
+  content: string;
+  }
   export type PathLayer = {
     type: LayerType.Path;
     x: number;
@@ -136,5 +145,6 @@ export type Color = {
     | EllipseLayer
     | PathLayer
     | TextLayer
+    | TextAttachmentLayer
     | NoteLayer;
   

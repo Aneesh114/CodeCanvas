@@ -21,6 +21,7 @@ import {
     Side,
     XYWH,
     Layer,
+    TextAttachmentLayer,
 } from "@/types/canvas";
 import {
     useHistory,
@@ -52,6 +53,8 @@ import { toPng } from "html-to-image";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import TextEditorModal from "@/app/text-editor/j57bfp99v64qj8n95sv3t7t9x1737w0c/textEditorModal";
+import TextAttachmentPreview from "@/app/text-editor/j57bfp99v64qj8n95sv3t7t9x1737w0c/textAttachmentLayer";
 
 
 
@@ -65,6 +68,10 @@ interface CanvasProps {
 
 export const Canvas = ({ boardId }: CanvasProps) => {
     const layerIds = useStorage((root) => root.layerIds);
+    const [isTextEditorOpen, setIsTextEditorOpen] = useState(false);
+    const [editingTextId, setEditingTextId] = useState<string | null>(null);
+
+    
 
     const pencilDraft = useSelf((me) => me.presence.pencilDraft);
 
@@ -91,6 +98,37 @@ export const Canvas = ({ boardId }: CanvasProps) => {
     const history = useHistory();
     const canUndo = useCanUndo();
     const canRedo = useCanRedo();
+    const saveTextContent = useMutation(({ storage, self }, content: string) => {
+        const liveLayers = storage.get("layers");
+        const liveLayerIds = storage.get("layerIds");
+        
+        if (editingTextId) {
+          // Update existing text attachment
+          const layer = liveLayers.get(editingTextId);
+          if (layer) {
+            layer.update({
+              content: content
+            } as Partial<TextAttachmentLayer>);
+          }
+        } else {
+          // Create new text attachment
+          const id = nanoid();
+          const layer = new LiveObject({
+            type: LayerType.TextAttachment,
+            x: camera.x + 100,
+            y: camera.y + 100,
+            width: 200,
+            height: 150,
+            content: content,
+            fill: lastUsedColor // Add the required fill property
+          } as TextAttachmentLayer);
+      
+          liveLayerIds.push(id);
+          liveLayers.set(id, layer);
+        }
+      
+        setEditingTextId(null);
+      }, [editingTextId, camera, lastUsedColor]);
 
     const toggleGrid = () => {
         setShowGrid((prev) => !prev);
@@ -99,6 +137,8 @@ export const Canvas = ({ boardId }: CanvasProps) => {
         setShowDots((prev) => !prev);
     };
     
+
+      
     const insertLayer = useMutation(
         (
             { storage, setMyPresence },
@@ -558,7 +598,7 @@ export const Canvas = ({ boardId }: CanvasProps) => {
             document.removeEventListener("keydown", onKeyDown);
         };
     }, [history]);
-
+    const layers = useStorage((root) => root.layers);
     return (
         <main className="h-full w-full relative bg-neutral-100 touch-none">
             <Info boardId={boardId} exportAsPng={exportAsPng} />
@@ -571,9 +611,20 @@ export const Canvas = ({ boardId }: CanvasProps) => {
                 undo={history.undo}
                 redo={history.redo}
                 toggleGrid={toggleGrid}
-                toggleDots={toggleDots} // Pass the new function
+                toggleDots={toggleDots}
+                setIsTextEditorOpen={setIsTextEditorOpen}
             />
-            {camera.x != 0 && camera.y != 0 && (
+            
+            <TextEditorModal 
+                isOpen={isTextEditorOpen}
+                onClose={() => {
+                    setIsTextEditorOpen(false);
+                    setEditingTextId(null);
+                }}
+                onSave={saveTextContent}
+            />
+
+            {camera.x !== 0 && camera.y !== 0 && (
                 <ResetCamera resetCamera={resetCamera} />
             )}
             <SelectionTools
@@ -584,7 +635,6 @@ export const Canvas = ({ boardId }: CanvasProps) => {
             />
             
             <svg
-                ref={svgRef}
                 className="h-[100vh] w-[100vw]"
                 onWheel={onWheel}
                 onPointerMove={onPointerMove}
@@ -593,7 +643,6 @@ export const Canvas = ({ boardId }: CanvasProps) => {
                 onPointerDown={onPointerDown}
             >
                 <g style={{ transform: `translate(${camera.x}px, ${camera.y}px)` }}>
-                    {/* Render grid if showGrid is true */}
                     {showGrid && (
                         <g className="grid-overlay">
                             {Array.from({ length: 200 }, (_, i) => (
@@ -620,29 +669,50 @@ export const Canvas = ({ boardId }: CanvasProps) => {
                             ))}
                         </g>
                     )}
-                    {showDots && ( // Conditional rendering for dots
-    <g className="dots-overlay">
-        {Array.from({ length: 200 }, (_, rowIndex) => (
-            Array.from({ length: 200 }, (_, colIndex) => (
-                <circle
-                    key={`dot-${rowIndex}-${colIndex}`}
-                    cx={colIndex * 50} // Adjust the spacing as needed
-                    cy={rowIndex * 50} // Adjust the spacing as needed
-                    r={2} // Radius of the dots
-                    fill="black" // Color of the dots
-                />
-            ))
-        ))}
-    </g>
-)}
-                    {layerIds.map((layerId) => (
-                        <LayerPreview
-                            key={layerId}
-                            id={layerId}
-                            onLayerPointerDown={onLayerPointerDown}
-                            selectionColor={layerIdsToColorSelection[layerId]}
-                        />
-                    ))}
+                    {showDots && (
+                        <g className="dots-overlay">
+                            {Array.from({ length: 200 }, (_, rowIndex) => (
+                                Array.from({ length: 200 }, (_, colIndex) => (
+                                    <circle
+                                        key={`dot-${rowIndex}-${colIndex}`}
+                                        cx={colIndex * 50}
+                                        cy={rowIndex * 50}
+                                        r={2}
+                                        fill="black"
+                                    />
+                                ))
+                            ))}
+                        </g>
+                    )}
+
+                    {layerIds.map((layerId) => {
+                        const layer = layers.get(layerId)
+                        
+                        if (layer && 'type' in layer && layer.type === LayerType.TextAttachment) {
+                            return (
+                                <TextAttachmentPreview
+                                    key={layerId}
+                                    id={layerId}
+                                    layer={layer as TextAttachmentLayer}
+                                    onDoubleClick={(id) => {
+                                        setEditingTextId(id);
+                                        setIsTextEditorOpen(true);
+                                    }}
+                                    selectionColor={layerIdsToColorSelection[layerId]}
+                                />
+                            );
+                        }
+                        
+                        return (
+                            <LayerPreview
+                                key={layerId}
+                                id={layerId}
+                                onLayerPointerDown={onLayerPointerDown}
+                                selectionColor={layerIdsToColorSelection[layerId]}
+                            />
+                        );
+                    })}
+
                     <SelectionBox
                         onResizeHandlePointerDown={onResizeHandlePointerDown}
                     />
@@ -678,7 +748,5 @@ export const Canvas = ({ boardId }: CanvasProps) => {
                 </g>
             </svg>
         </main>
-                
     );
 };
-    
