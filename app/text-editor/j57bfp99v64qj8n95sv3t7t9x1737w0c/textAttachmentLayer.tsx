@@ -1,11 +1,11 @@
 import React from 'react';
 import { FileText } from "lucide-react";
 import { colorToCss } from "@/lib/utils";
-import { LayerType } from "@/types/canvas";
+import { LayerType,TextAttachmentLayer } from "@/types/canvas";
 
 interface TextAttachmentPreviewProps {
   id: string;
-  layer: any;
+  layer: TextAttachmentLayer;
   onDoubleClick: (id: string) => void;
   selectionColor?: string;
 }
@@ -17,21 +17,25 @@ const TextAttachmentPreview = ({
   selectionColor 
 }: TextAttachmentPreviewProps) => {
   return (
-    <div
-      className="absolute shadow-md rounded-lg bg-white p-4 cursor-pointer"
-      style={{
-        transform: `translate(${layer.x}px, ${layer.y}px)`,
-        width: layer.width,
-        height: layer.height,
-        border: selectionColor ? `2px solid ${selectionColor}` : undefined,
-      }}
+    <foreignObject
+      id={id}
+      x={layer.x}
+      y={layer.y}
+      width={layer.width}
+      height={layer.height}
       onDoubleClick={() => onDoubleClick(id)}
+      style={{ 
+        outline: selectionColor ? `2px solid ${selectionColor}` : 'none'
+      }}
+      className="overflow-auto shadow-md rounded-lg bg-white"
     >
-      <div className="flex items-center gap-2">
-        <FileText className="h-6 w-6" />
-        <span className="font-medium">Text Document</span>
+      <div className="p-4 h-full w-full">
+        <div 
+          className="prose prose-sm max-w-none h-full"
+          dangerouslySetInnerHTML={{ __html: layer.content }}
+        />
       </div>
-    </div>
+    </foreignObject>
   );
 };
 
