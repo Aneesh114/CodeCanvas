@@ -1,3 +1,4 @@
+//types\canvas.ts
 export type Color = {
     r: number;
     g: number;
@@ -15,7 +16,7 @@ export type Color = {
     Path,
     Text,
     Note,
-    TextAttachment = "text-attachment"
+    File
   }
   
   export type RectangleLayer = {
@@ -37,15 +38,18 @@ export type Color = {
     fill: Color;
     value?: string;
   };
-  export type TextAttachmentLayer = {
+  export type FileLayer = {
+    type: LayerType.File;
     x: number;
     y: number;
-    width: number;
     height: number;
+    width: number;
     fill: Color;
-    type: LayerType.TextAttachment;
-  content: string;
-  }
+    value?: string;
+    fileName?: string;
+    fileUrl?: string;
+  };
+  
   export type PathLayer = {
     type: LayerType.Path;
     x: number;
@@ -115,7 +119,8 @@ export type Color = {
           | LayerType.Ellipse
           | LayerType.Rectangle
           | LayerType.Text
-          | LayerType.Note;
+          | LayerType.Note
+          | LayerType.File;
       }
     | {
         mode: CanvasMode.Pencil;
@@ -128,7 +133,12 @@ export type Color = {
         mode: CanvasMode.Resizing;
         initialBounds: XYWH;
         corner: Side;
-      };
+      }
+    | {
+      mode: CanvasMode.Inserting;
+      layerType: LayerType.File;
+      fileLink: string;
+  };
   
   export enum CanvasMode {
     None,
@@ -145,6 +155,6 @@ export type Color = {
     | EllipseLayer
     | PathLayer
     | TextLayer
-    | TextAttachmentLayer
-    | NoteLayer;
+    | NoteLayer
+    | FileLayer;
   

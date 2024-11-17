@@ -1,3 +1,6 @@
+"use client";
+
+import { useCallback, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToolButton } from "./tool-button";
 import {
@@ -13,10 +16,13 @@ import {
     Grip,
     FileText,
 } from "lucide-react";
+    Grip,
+    File,
+} from "lucide-react";
 import { CanvasMode, CanvasState, LayerType } from "@/types/canvas";
-import { useEffect } from "react";
 import { useSelf } from "@liveblocks/react/suspense";
 import { Button } from "@/components/ui/button";
+import { useOrganization } from "@clerk/nextjs";
 
 interface ToolbarProps {
     canvasState: CanvasState;
@@ -25,6 +31,7 @@ interface ToolbarProps {
     redo: () => void;
     canUndo: boolean;
     canRedo: boolean;
+    toggleGrid: () => void;
     toggleGrid: () => void;
     toggleDots: () => void;
     setIsTextEditorOpen: (isOpen: boolean) => void; // Add this prop
@@ -40,60 +47,68 @@ const Toolbar = ({
     toggleGrid,
     toggleDots,
     setIsTextEditorOpen, // Add this to props
+    toggleDots,
 }: ToolbarProps) => {
     const selection = useSelf((me) => me.presence.selection);
+    const { organization } = useOrganization();
 
-    useEffect(() => {
-        const onKeyDown = (e: KeyboardEvent) => {
-            if (selection?.length > 0) return;
-            switch (e.key) {
-                case "a":
-                    if (e.ctrlKey) setCanvasState({ mode: CanvasMode.None });
+    const onFileButtonClick = useCallback(() => {
+        if (!organization) {
+            console.error("No organization context found.");
+            return;
+        }
+
+        setCanvasState({
+            mode: CanvasMode.Inserting,
+            layerType: LayerType.File,
+        });
+    }, [organization, setCanvasState]);
+
+    const handleKeyDown = useCallback((e: KeyboardEvent) => {
+        if (selection?.length > 0) return;
+
+        if (e.ctrlKey) {
+            switch (e.key.toLowerCase()) {
+                case 'a':
+                    e.preventDefault();
+                    setCanvasState({ mode: CanvasMode.None });
                     break;
-
-                case "t":
-                    if (e.ctrlKey)
-                        setCanvasState({
-                            layerType: LayerType.Text,
-                            mode: CanvasMode.Inserting,
-                        });
+                case 't':
+                    e.preventDefault();
+                    setCanvasState({
+                        layerType: LayerType.Text,
+                        mode: CanvasMode.Inserting,
+                    });
                     break;
-
-                case "n":
-                    if (e.ctrlKey)
-                        setCanvasState({
-                            mode: CanvasMode.Inserting,
-                            layerType: LayerType.Note,
-                        });
+                case 'n':
+                    e.preventDefault();
+                    setCanvasState({
+                        mode: CanvasMode.Inserting,
+                        layerType: LayerType.Note,
+                    });
                     break;
-
-                case "r":
-                    if (e.ctrlKey)
-                        setCanvasState({
-                            mode: CanvasMode.Inserting,
-                            layerType: LayerType.Rectangle,
-                        });
+                case 'r':
+                    e.preventDefault();
+                    setCanvasState({
+                        mode: CanvasMode.Inserting,
+                        layerType: LayerType.Rectangle,
+                    });
                     break;
-
-                case "e":
-                    if (e.ctrlKey)
-                        setCanvasState({
-                            mode: CanvasMode.Inserting,
-                            layerType: LayerType.Ellipse,
-                        });
-                    break;
-
-                default:
+                case 'e':
+                    e.preventDefault();
+                    setCanvasState({
+                        mode: CanvasMode.Inserting,
+                        layerType: LayerType.Ellipse,
+                    });
                     break;
             }
-        };
-
-        document.addEventListener("keydown", onKeyDown);
-
-        return () => {
-            document.removeEventListener("keydown", onKeyDown);
-        };
+        }
     }, [selection, setCanvasState]);
+
+    useEffect(() => {
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [handleKeyDown]);
 
     return (
         <div className="absolute top-[50%] -translate-y-[50%] left-2 flex flex-col gap-y-4">
@@ -153,6 +168,20 @@ const Toolbar = ({
                     }
                 />
                 <ToolButton
+                    label="File"
+                    icon={File}
+                    onClick={() =>
+                        setCanvasState({
+                            mode: CanvasMode.Inserting,
+                            layerType: LayerType.File,
+                        })
+                    }
+                    isActive={
+                        canvasState.mode === CanvasMode.Inserting &&
+                        canvasState.layerType === LayerType.File
+                    }
+                />
+                <ToolButton
                     label="Ellipse (Ctrl+E)"
                     icon={Circle}
                     onClick={() =>
@@ -199,11 +228,16 @@ const Toolbar = ({
                     label="Toggle Dots"
                     icon={Grip}
                     onClick={toggleDots}
+                    icon={Grid}
+                    onClick={toggleGrid}
                 />
                 <ToolButton
                     label="Text Editor"
                     icon={FileText}
                     onClick={() => setIsTextEditorOpen(true)}
+                    label="Toggle dots"
+                    icon={Grip}
+                    onClick={toggleDots}
                 />
             </div>
         </div>
