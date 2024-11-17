@@ -16,9 +16,7 @@ import {
     Grip,
     FileText,
 } from "lucide-react";
-    Grip,
-    File,
-} from "lucide-react";
+    
 import { CanvasMode, CanvasState, LayerType } from "@/types/canvas";
 import { useSelf } from "@liveblocks/react/suspense";
 import { Button } from "@/components/ui/button";
@@ -32,7 +30,7 @@ interface ToolbarProps {
     canUndo: boolean;
     canRedo: boolean;
     toggleGrid: () => void;
-    toggleGrid: () => void;
+  
     toggleDots: () => void;
     setIsTextEditorOpen: (isOpen: boolean) => void; // Add this prop
 }
@@ -45,7 +43,7 @@ const Toolbar = ({
     canUndo,
     canRedo,
     toggleGrid,
-    toggleDots,
+
     setIsTextEditorOpen, // Add this to props
     toggleDots,
 }: ToolbarProps) => {
@@ -169,7 +167,7 @@ const Toolbar = ({
                 />
                 <ToolButton
                     label="File"
-                    icon={File}
+                    icon={FileText}
                     onClick={() =>
                         setCanvasState({
                             mode: CanvasMode.Inserting,
@@ -228,16 +226,14 @@ const Toolbar = ({
                     label="Toggle Dots"
                     icon={Grip}
                     onClick={toggleDots}
-                    icon={Grid}
-                    onClick={toggleGrid}
+                   
+                  
                 />
                 <ToolButton
                     label="Text Editor"
                     icon={FileText}
                     onClick={() => setIsTextEditorOpen(true)}
-                    label="Toggle dots"
-                    icon={Grip}
-                    onClick={toggleDots}
+                   
                 />
             </div>
         </div>
