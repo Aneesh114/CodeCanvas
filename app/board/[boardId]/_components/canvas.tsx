@@ -22,7 +22,7 @@ import {
     Point,
     Side,
     XYWH,
-    Layer,
+ 
     TextAttachmentLayer,
 } from "@/types/canvas";
 import {
@@ -100,7 +100,7 @@ export const Canvas = ({ boardId }: CanvasProps) => {
     const history = useHistory();
     const canUndo = useCanUndo();
     const canRedo = useCanRedo();
-    const saveTextContent = useMutation(({ storage, self }, content: string) => {
+    const saveTextContent = useMutation(({ storage,}, content: string) => {
         const liveLayers = storage.get("layers");
         const liveLayerIds = storage.get("layerIds");
         

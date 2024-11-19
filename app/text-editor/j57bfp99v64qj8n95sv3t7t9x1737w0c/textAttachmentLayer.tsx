@@ -1,7 +1,7 @@
 import React from 'react';
-import { FileText } from "lucide-react";
-import { colorToCss } from "@/lib/utils";
-import { LayerType,TextAttachmentLayer } from "@/types/canvas";
+//import { FileText } from "lucide-react";
+//import { colorToCss } from "@/lib/utils";
+import {TextAttachmentLayer } from "@/types/canvas";
 
 interface TextAttachmentPreviewProps {
   id: string;

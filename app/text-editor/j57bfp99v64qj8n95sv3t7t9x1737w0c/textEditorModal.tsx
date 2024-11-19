@@ -2,10 +2,10 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Editor from './_components/editor';
 import { Button } from "@/components/ui/button";
-import { FileText } from "lucide-react";
-import { useMutation } from "@/liveblocks.config";
-import { nanoid } from "nanoid";
-import { LayerType } from "@/types/canvas";
+//import { FileText } from "lucide-react";
+//import { useMutation } from "@/liveblocks.config";
+//import { nanoid } from "nanoid";
+//import { LayerType } from "@/types/canvas";
 
 interface TextEditorModalProps {
   isOpen: boolean;
@@ -14,7 +14,7 @@ interface TextEditorModalProps {
 }
 
 const TextEditorModal = ({ isOpen, onClose, onSave }: TextEditorModalProps) => {
-  const editorRef = React.useRef(null);
+ // const editorRef = React.useRef(null);
 
   const handleSave = () => {
     // Get content from editor - you'll need to implement this based on your Lexical setup

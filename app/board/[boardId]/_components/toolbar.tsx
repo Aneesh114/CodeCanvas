@@ -19,8 +19,8 @@ import {
     
 import { CanvasMode, CanvasState, LayerType } from "@/types/canvas";
 import { useSelf } from "@liveblocks/react/suspense";
-import { Button } from "@/components/ui/button";
-import { useOrganization } from "@clerk/nextjs";
+//import { Button } from "@/components/ui/button";
+//import { useOrganization } from "@clerk/nextjs";
 
 interface ToolbarProps {
     canvasState: CanvasState;
@@ -48,9 +48,9 @@ const Toolbar = ({
     toggleDots,
 }: ToolbarProps) => {
     const selection = useSelf((me) => me.presence.selection);
-    const { organization } = useOrganization();
+   // const { organization } = useOrganization();
 
-    const onFileButtonClick = useCallback(() => {
+    /*const onFileButtonClick = useCallback(() => {
         if (!organization) {
             console.error("No organization context found.");
             return;
@@ -60,7 +60,7 @@ const Toolbar = ({
             mode: CanvasMode.Inserting,
             layerType: LayerType.File,
         });
-    }, [organization, setCanvasState]);
+    }, [organization, setCanvasState]);*/
 
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
         if (selection?.length > 0) return;

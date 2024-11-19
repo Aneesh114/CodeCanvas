@@ -6,6 +6,7 @@ import {
   $createRangeSelection,
   $setSelection,
   TextNode,
+  ElementNode,
 } from 'lexical';
 import { Search, ArrowRight, ArrowLeft } from 'lucide-react';
 import {
@@ -23,7 +24,7 @@ interface Match {
   end: number;
   text: string;
 }
-
+import { LexicalNode } from 'lexical';
 export function FindReplace({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [editor] = useLexicalComposerContext();
   const [findText, setFindText] = useState('');
@@ -38,14 +39,15 @@ export function FindReplace({ isOpen, onClose }: { isOpen: boolean; onClose: () 
     editor.getEditorState().read(() => {
       const root = $getRoot();
       
-      const traverseNodes = (node: any) => { // Explicitly define 'node' type here as 'any'
+      const traverseNodes = (node: LexicalNode) => {
         if (node instanceof TextNode) {
-          textNodes.push(node);
-        } else if (node.getChildren) {
+          textNodes.push(node); // Collect TextNode
+        } else if (node instanceof ElementNode) {
+          // Only call getChildren on ElementNode
           node.getChildren().forEach(traverseNodes);
         }
       };
-      
+  
       traverseNodes(root);
     });
     console.log("All Text Nodes Collected:", textNodes.map(node => node.getTextContent()));

@@ -2,7 +2,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import {
   $createHeadingNode,
   $createQuoteNode,
-  $isHeadingNode,
+ // $isHeadingNode,
 } from "@lexical/rich-text";
 import {
   $getSelection,
@@ -10,12 +10,14 @@ import {
   FORMAT_TEXT_COMMAND,
   ElementNode,
   TextNode,
-  LexicalCommand,
-  COMMAND_PRIORITY_NORMAL,
-  createCommand,
+  //LexicalCommand,
+  //COMMAND_PRIORITY_NORMAL,
+  //createCommand,
   TextFormatType,
   $createTextNode,
   ElementFormatType,
+  LexicalNode,
+  $isTextNode,
 } from "lexical";
 import { $setBlocksType } from "@lexical/selection";
 import { 
@@ -24,14 +26,14 @@ import {
 } from "@lexical/list";
 import {
   INSERT_TABLE_COMMAND,
-  TableNode,
-  TableCellNode,
-  TableRowNode
+  //TableNode,
+  //TableCellNode,
+  //TableRowNode
 } from '@lexical/table';
 import { UNDO_COMMAND, REDO_COMMAND } from "lexical";
 import { Undo2, Redo2 } from "lucide-react"; 
 import { useUndoRedoState } from './hooks/useUndoRedoState';
-import { DialogTrigger } from "@/components/ui/dialog";
+//import { DialogTrigger } from "@/components/ui/dialog";
 import { StyledPdfDownload } from './StyledPdfDownload';
 import {
   Dialog,
@@ -44,7 +46,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { $createLinkNode, LinkNode } from '@lexical/link';
+import { $createLinkNode, } from '@lexical/link';
 import { useState, useCallback, useEffect } from "react";
 import { FindReplace } from './findReplace';
 import { Search } from 'lucide-react';
@@ -61,27 +63,27 @@ import {
   Heading1,
   Heading2,
   Heading3,
-  Quote,
+  //Quote,
   Link,
-  Image,
-  CheckSquare,
+  //Image,
+  //CheckSquare,
   Code,
   TextQuote,
   Highlighter,
   PaintBucket,
-  Type,
+  //Type,
   Table,
 } from "lucide-react";
 
 interface ColorPickerProps {
   onSelect: (color: string) => void;
 }
-
+/*
 interface TableInsertPayload {
   rows: string;
   columns: string;
   includeHeaders?: boolean;
-}
+}*/
 
 const ColorPicker = ({ onSelect }: ColorPickerProps) => {
   const colors = [
@@ -191,18 +193,78 @@ export default function EnhancedToolbar() {
   }, [editor]);
 
   const handleAlignment = useCallback((alignment: ElementFormatType) => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if ($isRangeSelection(selection)) {
-        selection.getNodes().forEach((node) => {
-          if (node instanceof ElementNode) {
-            node.setFormat(alignment);
-          }
-        });
-      }
-    });
-  }, [editor]);
 
+    editor.update(() => {
+
+      const selection = $getSelection();
+
+     
+
+      if (!selection) {
+
+        console.warn('No selection found');
+
+        return;
+
+      }
+
+ 
+
+      if (!$isRangeSelection(selection)) {
+
+        console.warn('Selection is not a range selection');
+
+        return;
+
+      }
+
+ 
+
+      // Get selected nodes or the current parent node if no specific selection
+
+      const nodes = selection.getNodes();
+
+     
+
+      if (nodes.length === 0) {
+
+        const anchor = selection.anchor;
+
+        const topLevelNode = anchor.getNode().getTopLevelElement();
+
+        if (topLevelNode instanceof ElementNode) {
+
+          topLevelNode.setFormat(alignment);
+
+        }
+
+        return;
+
+      }
+
+ 
+
+      // Apply alignment to all selected nodes
+
+      nodes.forEach((node) => {
+
+        // Get the top-level parent element for inline nodes
+
+        const topLevelNode = node.getTopLevelElement();
+
+       
+
+        if (topLevelNode instanceof ElementNode) {
+
+          topLevelNode.setFormat(alignment);
+
+        }
+
+      });
+
+    });
+
+  }, [editor]);
   const handleHeading = useCallback((tag: 'h1' | 'h2' | 'h3') => {
     editor.update(() => {
       const selection = $getSelection();
@@ -230,21 +292,34 @@ export default function EnhancedToolbar() {
   }, [editor]);
 
   const handleLink = useCallback(() => {
-    const url = prompt("Enter URL:");
-    if (url) {
-      editor.update(() => {
-        const selection = $getSelection();
-        if ($isRangeSelection(selection)) {
-          const linkNode = $createLinkNode(url);
-          const text = selection.getTextContent() || url;
-          const textNode = $createTextNode(text);
-          linkNode.append(textNode);
-          selection.insertNodes([linkNode]);
-        }
-      });
-    }
-  }, [editor]);
 
+    const url = prompt("Enter URL:");
+
+    if (url) {
+
+      editor.update(() => {
+
+        const selection = $getSelection();
+
+        if ($isRangeSelection(selection)) {
+
+          const linkNode = $createLinkNode(url);
+
+          const text = selection.getTextContent() || url;
+
+          const textNode = $createTextNode(text);
+
+          linkNode.append(textNode);
+
+          selection.insertNodes([linkNode]);
+
+        }
+
+      });
+
+    }
+
+  }, [editor]);
   const handleTable = useCallback((rows: string, cols: string) => {
     editor.dispatchCommand(INSERT_TABLE_COMMAND, {
       rows,

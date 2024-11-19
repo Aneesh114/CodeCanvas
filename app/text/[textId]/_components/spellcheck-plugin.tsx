@@ -1,10 +1,10 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
-  $getRoot,
+  //$getRoot,
   $createTextNode,
   TextNode,
   $createParagraphNode,
-  TextFormatType,
+  //TextFormatType,
   $getSelection,
   $isRangeSelection,
   RangeSelection,
@@ -30,15 +30,15 @@ interface SuggestionsMenuProps {
     onSelect: (text: string, type: 'word' | 'sentence') => void;
     onClose: () => void;
   }
-  
+  /*
   interface TextSuggestion {
     type: 'word' | 'sentence';
     text: string;
-  }
+  }*/
 
   export function SpellCheckPlugin() {
     const [editor] = useLexicalComposerContext();
-    const [misspelledWords, setMisspelledWords] = useState<Set<string>>(new Set());
+    //const [misspelledWords, setMisspelledWords] = useState<Set<string>>(new Set());
     const [suggestions, setSuggestions] = useState<{ words: string[], sentences: string[] }>({
       words: [],
       sentences: []

@@ -22,10 +22,10 @@ import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { LinkNode } from "@lexical/link";
 import EnhancedToolbar from './toolbar';
 import FloatingToolbar from "./floating-toolbar";
-import SpellCheckPlugin, { Placeholder } from "./spellcheck-plugin";
-import NotificationsPopover from "../notifications-popover";
+import SpellCheckPlugin from "./spellcheck-plugin";
+//import NotificationsPopover from "../notifications-popover";
 import Loading from "../loading";
-import VersionHistoryDialog from "../version-history-dialog";
+//import VersionHistoryDialog from "../version-history-dialog";
 import { useThreads } from "@liveblocks/react/suspense";
 import { useIsMobile } from "./use-is-mobile";
 //import { MentionsPlugin } from "./mentions-plugin";
@@ -77,7 +77,7 @@ const initialConfig = liveblocksConfig({
 export default function Editor() {
   const [content, setContent] = useState('');
   const status = useEditorStatus();
-  const { threads } = useThreads();
+  //const { threads } = useThreads();
 
   const handleChange = useCallback((e: FormEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
@@ -88,6 +88,7 @@ export default function Editor() {
     if (mentions.length > 0) {
       mentions.forEach(mention => {
         console.log(`User ${mention} was mentioned.`);
+        console.log('conted updated',content);
         // Add logic to create notifications here
       });
     }
@@ -102,8 +103,8 @@ export default function Editor() {
           ) : (
             <div className="relative flex flex-col h-full">
               <div className="h-[60px] flex items-center justify-end px-4 border-b border-border/80 bg-background">
-                <VersionHistoryDialog />
-                <NotificationsPopover />
+                
+                
               </div>
 
               <div className="h-auto border-b border-border/80 bg-background">
@@ -121,7 +122,7 @@ export default function Editor() {
                     }
                     placeholder={
                       <p className="pointer-events-none absolute top-0 left-0 text-muted-foreground w-full h-full">
-                        Try mentioning a user with @
+                        Start Typing....
                       </p>
                     }
                     ErrorBoundary={LexicalErrorBoundary}

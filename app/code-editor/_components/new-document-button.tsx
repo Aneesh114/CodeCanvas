@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+//import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
@@ -16,12 +16,12 @@ export const NewDocumentButton = ({
     orgId,
     disabled,
 }: NewDocumentButtonProps) => {
-    const router = useRouter();
+    //const router = useRouter();
     const create = useMutation(api.codeDocument.create);
 
     const onCreate = async () => {
         try {
-            const documentId = await create({
+            await create({
                 orgId,
                 title: "Untitled",
                 language: "python",
@@ -31,6 +31,7 @@ export const NewDocumentButton = ({
             //router.push(`/code-editor/${documentId}`);
             toast.success("Code document created");
         } catch (error) {
+            console.log(error)
             toast.error("Failed to create code document");
         }
     };

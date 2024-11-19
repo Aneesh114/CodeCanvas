@@ -2,7 +2,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { useCallback, useEffect } from "react";
 import { TextNode, $getSelection, $isRangeSelection } from "lexical";
 import { useRoom } from "@liveblocks/react";
-import type { ThreadMetada } from "@liveblocks/client";
+//import type { ThreadMetada } from "@liveblocks/client";
 
 interface MentionMetadata extends ThreadMetadata {
   type: 'mention';
